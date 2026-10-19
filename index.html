@@ -9,107 +9,165 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{--bg:#121212;--cd:#1e1e1e;--ac:#10b981;--tx:#eceff1;--mu:#9aa3a8;--bd:#2c2c2c;--er:#f87171;--wn:#fbbf24}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-main{max-width:560px;margin:0 auto;padding:12px 12px 40px}h1{font-size:19px;margin:6px 2px 10px}
-.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{flex:1;background:var(--cd);color:var(--mu);border:1px solid var(--bd)}.tabs button.on{background:var(--ac);color:#04271b;border-color:var(--ac)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,sans-serif;padding-top:env(safe-area-inset-top)}
+main{max-width:560px;margin:0 auto;padding:12px 12px calc(84px + env(safe-area-inset-bottom))}h1{font-size:19px;margin:6px 2px 10px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:10px 4px 9px;font-size:12px;font-weight:600}nav button b{display:block;font-size:20px}nav button.on{color:var(--ac)}
 .cd{background:var(--cd);border-radius:14px;padding:12px;margin-bottom:12px}h2{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mu);margin:0 0 8px}
 label{display:block;font-size:12px;color:var(--mu);margin:8px 0 3px}
 input{width:100%;font:inherit;padding:11px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
-button{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;font:inherit;border:0;border-radius:10px;padding:11px 14px;background:var(--ac);color:#04271b;font-weight:700}button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-weight:500;padding:6px 10px;font-size:14px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
-.k{background:var(--cd);border-radius:12px;padding:10px}.k small{display:block;color:var(--mu);font-size:12px}.k b{font-size:20px}
-#msg{margin-top:8px;font-size:14px;white-space:pre-line}.er{color:var(--er)}.wn{color:var(--wn)}.ok{color:var(--ac)}
-.h{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--bd)}.h small{color:var(--mu)}
-.chk{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--mu)}.chk input{width:auto}
-.hide{display:none!important}.top{display:flex;align-items:center;justify-content:space-between;gap:8px}#bn{background:var(--cd);border:1px solid var(--wn);color:var(--wn);border-radius:12px;padding:10px;margin-bottom:12px;font-size:14px}canvas{max-height:220px}
+button{-webkit-user-select:none;user-select:none;touch-action:manipulation;cursor:pointer;font:inherit;border:0;border-radius:10px;padding:11px 14px;background:var(--ac);color:#04271b;font-weight:700}
+button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-weight:500;padding:6px 10px;font-size:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.k{background:var(--cd);border-radius:12px;padding:10px}.k small{display:block;color:var(--mu);font-size:12px}.k b{font-size:19px}.big{font-size:28px;color:var(--ac)}
+#msg{margin-top:10px;font-size:14px;white-space:pre-line}.er{color:var(--er)}.wn{color:var(--wn)}.ok{color:var(--ac)}.mu{color:var(--mu);font-size:13px}
+.h{padding:10px 0;border-top:1px solid var(--bd)}.hh{display:flex;justify-content:space-between;gap:8px;align-items:center}.h small{color:var(--mu)}.ef{margin-top:8px}
+.hide{display:none!important}canvas{max-height:220px}.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#bn{background:var(--cd);border:1px solid var(--wn);color:var(--wn);border-radius:12px;padding:10px;margin-bottom:12px;font-size:14px}
 </style></head><body><main>
 <div class="top"><h1>⛽ Combustível Pro</h1><button id="ib" type="button">Instalar App</button></div>
 <div id="bn" class="hide"></div>
-<div class="tabs"><button id="t1" class="on">Registrar</button><button id="t2">Histórico &amp; Gráficos</button></div>
 
 <section id="p1">
- <div class="cd"><h2>Atalhos</h2><div class="row" id="sc"></div></div>
- <div class="cd"><h2>Novo abastecimento</h2>
-  <div class="g2"><div><label>Data</label><input id="d" type="date"></div><div><label>KM do odômetro</label><input id="km" inputmode="numeric" placeholder="52300"></div>
-  <div><label>Valor total (R$)</label><input id="vt" inputmode="decimal" placeholder="80"></div><div><label>Litros</label><input id="lt" inputmode="decimal"></div></div>
-  <label>Preço/L (vazio = usa o do último abastecimento)</label><input id="pl" inputmode="decimal" placeholder="5,79">
-  <label class="chk"><input id="ch" type="checkbox" checked>Encheu o tanque</label>
-  <button id="sv" style="width:100%;margin-top:12px">Salvar</button><div id="msg"></div></div>
+ <div class="cd"><h2>Registrar abastecimento</h2>
+  <input id="tx" placeholder='Ex.: Abasteci 80 reais, 52.300 km' enterkeyhint="send" autocomplete="off">
+  <label>Retroativo? Data (opcional — vazio = hoje ou a data escrita na frase)</label><input id="dt" type="date">
+  <button id="sv" style="width:100%;margin-top:12px">Registrar</button><div id="msg"></div>
+  <div class="chips" id="ch"></div>
+  <p class="mu">Também entende: “ontem…”, “anteontem…”, “há 3 dias…”, “12/09…”, “dia 5…”, “50L a 5,79/L”, “parcial” (não encheu o tanque). Esqueceu de lançar? Pode enviar depois: a linha do tempo é reordenada e recalculada.</p></div>
 </section>
 
 <section id="p2" class="hide">
+ <div class="cd"><h2>🔮 Previsão (30 dias)</h2><div id="pv"></div></div>
  <div class="g2" id="kp"></div>
- <div class="cd" style="margin-top:12px"><h2>Evolução do consumo (km/L)</h2><canvas id="ch1"></canvas><div id="nc" class="wn"></div></div>
+ <div class="cd" style="margin-top:12px"><h2>Evolução do consumo (km/L)</h2><canvas id="cv"></canvas><div id="nc" class="wn"></div></div>
+</section>
+
+<section id="p3" class="hide">
  <div class="cd"><h2>Histórico</h2><div id="hi"></div></div>
- <div class="cd"><h2>Backup CSV</h2><div class="row"><button id="ex">Baixar CSV</button><button id="im" class="g">Importar CSV</button></div><input id="fi" type="file" accept=".csv,.txt,text/csv" class="hide"><div id="mi"></div></div>
+ <div class="cd"><h2>Backup CSV</h2><div class="row"><button id="ex">Baixar CSV</button><button id="im" class="g">Importar CSV</button></div><input id="fi" type="file" accept=".csv,.txt,text/csv" class="hide"><div id="mi" class="mu"></div></div>
  <div class="cd"><h2>Nuvem (Google Sheets)</h2>
   <label>URL do Apps Script (termina em /exec)</label><input id="cu" placeholder="https://script.google.com/macros/s/.../exec">
   <label>Token (o mesmo do script)</label><input id="ct" type="password">
-  <div class="row" style="margin-top:10px"><button id="sa" class="g">Salvar config</button><button id="sp" class="g">Enviar agora</button><button id="sl" class="g">Puxar da nuvem</button></div><div id="ms"></div></div>
+  <div class="row" style="margin-top:10px"><button id="sa" class="g">Salvar config</button><button id="sp" class="g">Enviar agora</button><button id="sl" class="g">Puxar da nuvem</button></div><div id="ms" class="mu"></div></div>
 </section>
 </main>
+<nav><button id="n1" class="on"><b>✍️</b>Registrar</button><button id="n2"><b>📊</b>Resumo</button><button id="n3"><b>🗂️</b>Dados</button></nav>
 <script>
 addEventListener("error",e=>{const b=document.querySelector("#bn");if(b){b.textContent="Erro no app: "+e.message;b.classList.remove("hide")}});
-const $=s=>document.querySelector(s),K="combpro_v1",KC="combpro_cfg";
+const $=s=>document.querySelector(s),K="combpro_v2",KC="combpro_cfg",N="(\\d[\\d.,]*)";
 const f2=(x,n=2)=>x.toLocaleString("pt-BR",{minimumFractionDigits:n,maximumFractionDigits:n}),brl=x=>"R$ "+f2(x),fk=x=>Math.round(x).toLocaleString("pt-BR");
 const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),fd=s=>s.slice(8)+"/"+s.slice(5,7)+"/"+s.slice(0,4);
-const num=s=>{s=String(s??"").replace(/[^\d.,-]/g,"");if(!s)return NaN;if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,"");return parseFloat(s)};
-let S={updated:0,items:[]},cfg={url:"",token:""},delId=null,chart=null;
-const rows=()=>S.items.slice().sort((a,b)=>a.km-b.km||a.data.localeCompare(b.data));
+const pd=s=>{const[a,b,c]=s.split("-");return new Date(+a,+b-1,+c)},addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x},today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
 const sum=a=>a.reduce((x,y)=>x+y,0);
+const num=s=>{s=String(s??"").replace(/[^\d.,-]/g,"").replace(/^[.,]+|[.,]+$/g,"");if(!s)return NaN;if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,"");return parseFloat(s)};
+let S={updated:0,items:[]},cfg={url:"",token:""},delId=null,edId=null,chart=null;
+const rows=()=>S.items.slice().sort((a,b)=>a.km-b.km||a.data.localeCompare(b.data));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
 /* abas */
-for(const n of[1,2])$("#t"+n).onclick=()=>{for(const m of[1,2]){$("#t"+m).classList.toggle("on",m==n);$("#p"+m).classList.toggle("hide",m!=n)}if(n==2)render()};
+function tab(n){for(const m of[1,2,3]){$("#n"+m).classList.toggle("on",m==n);$("#p"+m).classList.toggle("hide",m!=n)}if(n==2)drawChart();scrollTo(0,0)}
+for(const n of[1,2,3])$("#n"+n).onclick=()=>tab(n);
 
 /* persistência local + nuvem */
-function load(){try{S=JSON.parse(localStorage.getItem(K))||S;cfg=JSON.parse(localStorage.getItem(KC))||cfg}catch(e){}$("#cu").value=cfg.url;$("#ct").value=cfg.token}
-function commit(){S.updated=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}render();clearTimeout(commit.t);commit.t=setTimeout(()=>push(true),1200)}
-const smsg=(t,c)=>{$("#ms").className=c||"";$("#ms").textContent=t};
-async function push(quiet){if(!cfg.url)return;try{const r=await fetch(cfg.url,{method:"POST",body:JSON.stringify({token:cfg.token,dados:S})}),j=await r.json();
-  if(!j.ok)throw 0;smsg("☁️ Salvo na nuvem às "+new Date().toLocaleTimeString("pt-BR"),"ok")}catch(e){smsg("Não consegui enviar (sem internet, URL ou token errados). Os dados seguem salvos no aparelho.","er")}}
-async function pull(force){if(!cfg.url)return;try{const r=await fetch(cfg.url+"?token="+encodeURIComponent(cfg.token)),j=await r.json();if(!j.ok)throw 0;
-  const c=j.dados;if(force||c.updated>S.updated){S=c;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}render();smsg("☁️ Dados da nuvem carregados ("+S.items.length+" lançamentos)","ok")}
-  else if(S.updated>c.updated)push(true)}catch(e){smsg("Não consegui ler a nuvem.","er")}}
-$("#sa").onclick=()=>{cfg={url:$("#cu").value.trim(),token:$("#ct").value};localStorage.setItem(KC,JSON.stringify(cfg));smsg("Config salva.");pull(false)};
-$("#sp").onclick=()=>{cfg={url:$("#cu").value.trim(),token:$("#ct").value};localStorage.setItem(KC,JSON.stringify(cfg));push()};
-$("#sl").onclick=()=>pull(true);
+function load(){try{S=JSON.parse(localStorage.getItem(K)||localStorage.getItem("combpro_v1"))||S;cfg=JSON.parse(localStorage.getItem(KC))||cfg}catch(e){}$("#cu").value=cfg.url;$("#ct").value=cfg.token}
+function commit(){S.updated=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}render();clearTimeout(commit.t);commit.t=setTimeout(push,1200)}
+const smsg=(t,c)=>{$("#ms").className="mu "+(c||"");$("#ms").textContent=t};
+async function push(){if(!cfg.url)return;try{const r=await fetch(cfg.url,{method:"POST",body:JSON.stringify({token:cfg.token,dados:S})}),j=await r.json();if(!j.ok)throw 0;smsg("☁️ Salvo na nuvem às "+new Date().toLocaleTimeString("pt-BR"),"ok")}catch(e){smsg("Não consegui enviar (internet, URL ou token). Os dados seguem salvos no aparelho.","er")}}
+async function pull(force){if(!cfg.url)return;try{const r=await fetch(cfg.url+"?token="+encodeURIComponent(cfg.token)),j=await r.json();if(!j.ok)throw 0;const c=j.dados;
+  if(force||c.updated>S.updated){S=c;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}render();smsg("☁️ Carregado da nuvem ("+S.items.length+" lançamentos)","ok")}else if(S.updated>c.updated)push()}catch(e){smsg("Não consegui ler a nuvem (confira URL e token).","er")}}
+const saveCfg=()=>{cfg={url:$("#cu").value.trim(),token:$("#ct").value};localStorage.setItem(KC,JSON.stringify(cfg))};
+$("#sa").onclick=()=>{saveCfg();smsg("Config salva.");pull(false)};$("#sp").onclick=()=>{saveCfg();push()};$("#sl").onclick=()=>{saveCfg();pull(true)};
 
-/* métricas: método do tanque cheio (recalculado sempre, então retroativo não distorce) */
-function trechos(r){const o=[];let b=null,L=0,C=0;for(const x of r){if(!b){if(x.cheio)b=x;continue}L+=x.litros;C+=x.total;if(x.cheio){const d=x.km-b.km;if(d>0&&L>0)o.push({ate:x.km,data:x.data,dist:d,L,C,kml:d/L,rkm:C/d});b=x;L=0;C=0}}return o}
-
-/* formulário */
-const msg=(t,c)=>{$("#msg").className=c||"";$("#msg").innerHTML=t};
-[60,100,150,200].forEach(v=>{const b=document.createElement("button");b.className="g";b.textContent="Abasteci R$ "+v;b.onclick=()=>{$("#vt").value=v;$("#lt").value="";$("#km").focus()};$("#sc").append(b)});
-$("#d").value=iso(new Date());
-$("#sv").onclick=()=>{
-  const data=$("#d").value,km=num($("#km").value);let T=num($("#vt").value),L=num($("#lt").value),P=num($("#pl").value),est=0;
-  if(!data||isNaN(km))return msg("Informe a data e o KM do odômetro.","er");
-  if(data>iso(new Date()))return msg("A data não pode ser no futuro.","er");
-  const R=rows();if(R.some(x=>Math.abs(x.km-km)<.5))return msg("Já existe abastecimento com "+fk(km)+" km.","er");
+/* interpretação da frase */
+function tira(rx,t){const m=t.match(rx);return m?[m,t.slice(0,m.index)+" "+t.slice(m.index+m[0].length)]:[null,t]}
+function interpretar(txt){
+  const H=today();let t=" "+txt.toLowerCase()+" ",m;const r={data:null,km:null,litros:null,total:null,preco:null,cheio:true};
+  [m,t]=tira(/\b(?:anteontem|antes de ontem)\b/,t);if(m)r.data=addD(H,-2);
+  else{[m,t]=tira(/\bontem\b/,t);if(m)r.data=addD(H,-1);
+  else{[m,t]=tira(/\bh[aá]\s+(\d+)\s+dias?\b|\b(\d+)\s+dias?\s+atr[aá]s\b/,t);if(m)r.data=addD(H,-(+(m[1]||m[2])));
+  else{[m,t]=tira(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/,t);
+   if(m){const d=+m[1],mo=+m[2];let y=m[3]?+m[3]:null;if(y!==null&&y<100)y+=2000;let dt=new Date(y===null?H.getFullYear():y,mo-1,d);if(dt.getMonth()!==mo-1||dt.getDate()!==d)throw new Error("Data inválida.");if(y===null&&dt>H)dt=new Date(H.getFullYear()-1,mo-1,d);r.data=dt}
+   else{[m,t]=tira(/\bdia\s+(\d{1,2})\b/,t);if(m){const d=+m[1];let mo=H.getMonth(),y=H.getFullYear();if(d>H.getDate()){mo--;if(mo<0){mo=11;y--}}const dt=new Date(y,mo,d);if(dt.getDate()!==d)throw new Error("Data inválida.");r.data=dt}}}}}
+  t=t.replace(/\bhoje\b/g," ");
+  [m,t]=tira(/\bparcial\b|\bn[aã]o encheu\b|\bsem completar\b/,t);if(m)r.cheio=false;
+  [m,t]=tira(new RegExp("(?:pre[cç]o\\s*(?:de\\s*)?)?(?:r\\$\\s*)?"+N+"\\s*(?:/\\s*(?:l|lt|litro)\\b|\\s+(?:por|o)\\s+litro\\b)|pre[cç]o\\s*(?:de\\s*)?(?:r\\$\\s*)?"+N),t);if(m)r.preco=num(m[1]||m[2]);
+  [m,t]=tira(new RegExp("km\\s*[:=]?\\s*"+N+"|"+N+"\\s*(?:km|quil[oô]metros?)\\b"),t);if(m)r.km=num(m[1]||m[2]);
+  [m,t]=tira(new RegExp("\\b"+N+"\\s*(?:litros?|lts?|l)\\b"),t);if(m)r.litros=num(m[1]);
+  [m,t]=tira(new RegExp("r\\$\\s*"+N+"|"+N+"\\s*(?:reais|real|contos?|pilas?|rs)\\b"),t);if(m)r.total=num(m[1]||m[2]);
+  if(r.km===null){[m,t]=tira(/\b(\d{1,3}(?:\.\d{3})+|\d{4,})\b/,t);if(m)r.km=num(m[1])}
+  return r}
+function checar(R,data,km){
+  if(data>iso(today()))throw new Error("A data não pode ser no futuro.");
+  if(R.some(x=>Math.abs(x.km-km)<.5))throw new Error("Já existe abastecimento com "+fk(km)+" km.");
   const a=R.filter(x=>x.km<km).pop(),p=R.find(x=>x.km>km);
-  if(a&&a.data>data)return msg("Inconsistente: em "+fd(a.data)+" o carro estava com "+fk(a.km)+" km.","er");
-  if(p&&p.data<data)return msg("Inconsistente: em "+fd(p.data)+" o carro já tinha "+fk(p.km)+" km.","er");
-  if(T>0&&P>0&&!(L>0))L=T/P;else if(T>0&&L>0)P=T/L;else if(L>0&&P>0)T=L*P;
-  else if(T>0||L>0){const ref=(R.filter(x=>x.data<=data).pop()||R[R.length-1]);if(!ref)return msg("1º registro: informe o preço/L ou valor + litros.","er");P=ref.preco;est=1;if(T>0)L=T/P;else T=L*P}
-  else return msg("Informe o valor (R$), os litros ou o preço.","er");
-  const retro=R.some(x=>x.km>km||x.data>data);
-  S.items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),data,km,litros:L,total:T,preco:P,cheio:$("#ch").checked,estimado:est});commit();
-  const tr=trechos(rows()),t=tr.find(x=>x.ate===km);let h="<span class='ok'>✅ Salvo"+(retro?" (retroativo — histórico recalculado)":"")+"</span>\n"+f2(L)+" L · "+brl(T)+" · "+brl(P)+"/L"+(est?" <span class='wn'>(preço estimado do último abastecimento)</span>":"");
-  if(t)h+="\nTrecho: "+fk(t.dist)+" km · "+f2(t.kml)+" km/L · "+brl(t.rkm)+"/km";
-  const o=tr.filter(x=>x.ate!==km);if(t&&o.length>=3){const m=sum(o.map(x=>x.dist))/sum(o.map(x=>x.L));if(Math.abs(t.kml/m-1)>.35)h+="\n<span class='wn'>⚠️ km/L fora do padrão (média "+f2(m)+"). Pode ter faltado lançar um abastecimento ou o KM está errado.</span>"}
-  msg(h);for(const i of["#km","#vt","#lt","#pl"])$(i).value="";
-};
+  if(a&&a.data>data)throw new Error("Inconsistente: em "+fd(a.data)+" o carro estava com "+fk(a.km)+" km, então "+fk(km)+" km não cabe em "+fd(data)+".");
+  if(p&&p.data<data)throw new Error("Inconsistente: em "+fd(p.data)+" o carro já tinha "+fk(p.km)+" km, então "+fk(km)+" km não cabe em "+fd(data)+".")}
 
-/* dashboard, gráfico, histórico */
+/* métricas: método do tanque cheio, recalculado sempre da linha do tempo */
+function trechos(r){const o=[];let b=null,L=0,C=0;for(const x of r){if(!b){if(x.cheio)b=x;continue}L+=x.litros;C+=x.total;if(x.cheio){const d=x.km-b.km;if(d>0&&L>0)o.push({de:b.km,ate:x.km,data:x.data,dist:d,L,C,kml:d/L,rkm:C/d});b=x;L=0;C=0}}return o}
+const kmlG=t=>sum(t.map(x=>x.dist))/sum(t.map(x=>x.L)),rkmG=t=>sum(t.map(x=>x.C))/sum(t.map(x=>x.dist));
+function aviso(R,km){const tr=trechos(R);let h="";for(const t of tr)if(t.ate===km||t.de===km){const o=tr.filter(x=>x!==t);if(o.length>=3){const m=kmlG(o);if(Math.abs(t.kml/m-1)>.35)h+="\n<span class='wn'>⚠️ Trecho "+fk(t.de)+"→"+fk(t.ate)+" km deu "+f2(t.kml)+" km/L (média "+f2(m)+"). Pode ter faltado lançar um abastecimento ou o km está errado.</span>"}}return h}
+
+/* registrar */
+const ex=["Abasteci 80 reais, 52.300 km","50L, 52.300 km","Ontem abasteci 60 reais a 51.900 km","12/09 40L a 5,79/L 52.000 km"];
+$("#ch").innerHTML=ex.map(x=>"<button class='g' type='button'>"+x+"</button>").join("");
+$("#ch").onclick=e=>{if(e.target.tagName==="BUTTON"){$("#tx").value=e.target.textContent;$("#tx").focus()}};
+const msg=(t,c)=>{$("#msg").className=c||"";$("#msg").innerHTML=t};
+function registrar(){
+  const txt=$("#tx").value.trim();if(!txt)return;
+  try{
+    const r=interpretar(txt);if(r.km===null)throw new Error("Faltou a quilometragem. Ex.: 'Abasteci 80 reais, 52.300 km'.");
+    const data=$("#dt").value||iso(r.data||today()),R=rows();checar(R,data,r.km);
+    let T=r.total,L=r.litros,P=r.preco,est=0;
+    if(L>0&&T>0)P=T/L;else if(L>0&&P>0)T=L*P;else if(T>0&&P>0)L=T/P;
+    else if(T>0||L>0){const ref=R.filter(x=>x.data<=data).pop()||R[R.length-1];if(!ref)throw new Error("1º registro: informe litros + valor (40L 232 reais) ou o preço (5,80/L).");P=ref.preco;est=1;if(T>0)L=T/P;else T=L*P}
+    else throw new Error("Não entendi quanto abasteceu. Ex.: 'Abasteci 80 reais, 52.300 km'.");
+    const retro=R.some(x=>x.km>r.km||x.data>data);
+    S.items.push({id:uid(),data,km:r.km,litros:L,total:T,preco:P,cheio:r.cheio,estimado:est});commit();
+    const all=rows(),tr=trechos(all),t=tr.find(x=>x.ate===r.km);
+    let h="<span class='ok'>✅ Registrado"+(retro?" (retroativo — linha do tempo recalculada)":"")+"</span>\n"+fd(data)+" · "+fk(r.km)+" km · "+f2(L)+" L · "+brl(T)+" · "+brl(P)+"/L"+(est?" <span class='wn'>(preço estimado — corrija na aba Dados)</span>":"");
+    if(!r.cheio)h+="\nTanque parcial: conta no próximo trecho completo.";
+    if(t)h+="\nTrecho: "+fk(t.dist)+" km · "+f2(t.kml)+" km/L · "+brl(t.rkm)+"/km";
+    msg(h+aviso(all,r.km));$("#tx").value="";$("#dt").value=""
+  }catch(e){msg("⚠️ "+e.message,"er")}}
+$("#sv").onclick=registrar;$("#tx").addEventListener("keydown",e=>{if(e.key==="Enter")registrar()});
+
+/* resumo + previsão + gráfico */
+function prever(R,tr){
+  if(R.length<3||!tr.length)return "<span class='mu'>Preciso de pelo menos 3 abastecimentos (2 com tanque cheio).</span>";
+  const fim=R[R.length-1].data,lim=iso(addD(pd(fim),-90));let c=R.filter(r=>r.data>=lim);if(c.length<2)c=R.slice(-2);
+  const a=c[0],b=c[c.length-1],dias=Math.round((pd(b.data)-pd(a.data))/864e5);if(dias<=0)return "<span class='mu'>Os lançamentos recentes são do mesmo dia; ainda não dá para estimar o ritmo.</span>";
+  const kd=(b.km-a.km)/dias,rec=tr.slice(-3),ck=sum(rec.map(t=>t.C))/sum(rec.map(t=>t.dist)),lo=Math.min(...rec.map(t=>t.rkm)),hi=Math.max(...rec.map(t=>t.rkm)),k30=kd*30,k=(x,y)=>"<div class='k'><small>"+x+"</small><b>"+y+"</b></div>";
+  let h="<div class='big'><b>"+brl(k30*ck)+"</b></div><div class='mu'>gasto estimado nos próximos 30 dias</div><div class='g3' style='margin-top:10px'>"+k("Faixa",brl(k30*lo)+" a "+brl(k30*hi))+k("Ritmo",f2(kd,1)+" km/dia")+k("Custo/km",brl(ck))+"</div><div class='mu' style='margin-top:8px'>~"+fk(k30)+" km em 30 dias · custo dos últimos "+rec.length+" trechos</div>";
+  const at=Math.round((today()-pd(fim))/864e5);if(at>30)h+="<div class='wn' style='margin-top:8px'>⚠️ Último registro há "+at+" dias — pode faltar lançar abastecimentos; a previsão pode estar subestimada.</div>";return h}
 function render(){
-  const R=rows(),tr=trechos(R),u=tr[tr.length-1],k=(a,b)=>"<div class='k'><small>"+a+"</small><b>"+b+"</b></div>";
-  const pm=R.length?sum(R.map(x=>x.total))/sum(R.map(x=>x.litros)):null;
-  $("#kp").innerHTML=k("km/L último trecho",u?f2(u.kml):"—")+k("km/L média histórica",tr.length?f2(sum(tr.map(x=>x.dist))/sum(tr.map(x=>x.L))):"—")+k("R$/km (último)",u?brl(u.rkm):"—")+k("Preço médio/L",pm?brl(pm):"—");
-  $("#hi").innerHTML=R.length?R.slice().reverse().map(x=>{const t=tr.find(y=>y.ate===x.km);return"<div class='h'><div><b>"+fd(x.data)+" · "+fk(x.km)+" km</b><br><small>"+f2(x.litros)+" L · "+brl(x.total)+" · "+brl(x.preco)+"/L"+(x.estimado?"*":"")+(x.cheio?"":" · parcial")+(t?" · "+f2(t.kml)+" km/L":"")+"</small></div><button class='g' data-i='"+x.id+"'>"+(delId===x.id?"Confirmar?":"🗑")+"</button></div>"}).join(""):"<small>Nenhum abastecimento ainda.</small>";
-  if(window.Chart&&$("#p2").offsetParent!==null||window.Chart&&!chart){const cv=$("#ch1"),m=tr.length?sum(tr.map(x=>x.dist))/sum(tr.map(x=>x.L)):0;
-    if(chart)chart.destroy();chart=new Chart(cv,{type:"line",data:{labels:tr.map(x=>fd(x.data).slice(0,5)),datasets:[{label:"km/L",data:tr.map(x=>+x.kml.toFixed(2)),borderColor:"#10b981",backgroundColor:"#10b98133",tension:.3,fill:true},{label:"média",data:tr.map(()=>+m.toFixed(2)),borderColor:"#9aa3a8",borderDash:[5,5],pointRadius:0}]},options:{plugins:{legend:{labels:{color:"#9aa3a8"}}},scales:{x:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}},y:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}}}}})}
-  $("#nc").textContent=window.Chart?(tr.length<2?"O gráfico aparece com 2+ trechos (abastecimentos com tanque cheio).":""):"Gráfico indisponível offline na 1ª abertura."}
-$("#hi").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(delId===b.dataset.i){S.items=S.items.filter(x=>x.id!==delId);delId=null;commit()}else{delId=b.dataset.i;render()}};
+  const R=rows(),tr=trechos(R),u=tr[tr.length-1],k=(a,b)=>"<div class='k'><small>"+a+"</small><b>"+b+"</b></div>",pm=R.length?sum(R.map(x=>x.total))/sum(R.map(x=>x.litros)):null;
+  $("#pv").innerHTML=prever(R,tr);
+  $("#kp").innerHTML=k("km/L último trecho",u?f2(u.kml):"—")+k("km/L histórico",tr.length?f2(kmlG(tr)):"—")+k("R$/km último",u?brl(u.rkm):"—")+k("R$/km histórico",tr.length?brl(rkmG(tr)):"—")+k("Preço último litro",R.length?brl(R[R.length-1].preco):"—")+k("Preço médio litro",pm?brl(pm):"—");
+  $("#hi").innerHTML=R.length?R.slice().reverse().map(x=>{const t=tr.find(y=>y.ate===x.km);
+    let h="<div class='h'><div class='hh'><div><b>"+fd(x.data)+" · "+fk(x.km)+" km</b><br><small>"+f2(x.litros)+" L · "+brl(x.total)+" · "+brl(x.preco)+"/L"+(x.estimado?"*":"")+(x.cheio?"":" · parcial")+(t?" · "+f2(t.kml)+" km/L":"")+"</small></div><div class='row' style='flex:none'><button class='g' data-a='e' data-i='"+x.id+"'>✏️</button><button class='g' data-a='d' data-i='"+x.id+"'>"+(delId===x.id?"Confirmar?":"🗑")+"</button></div></div>";
+    if(edId===x.id)h+="<div class='ef'><div class='g2'><div><label>Data</label><input id='e_d' type='date' value='"+x.data+"'></div><div><label>KM</label><input id='e_k' inputmode='numeric' value='"+x.km+"'></div><div><label>Valor total (R$)</label><input id='e_t' inputmode='decimal' value='"+f2(x.total)+"'></div><div><label>Litros</label><input id='e_l' inputmode='decimal' value='"+f2(x.litros)+"'></div></div><label>Preço/L</label><input id='e_p' inputmode='decimal' value='"+f2(x.preco,3)+"'><div class='row' style='margin-top:10px'><button data-a='s' data-i='"+x.id+"'>Salvar e recalcular</button><button class='g' data-a='c'>Cancelar</button></div><div id='em' class='er mu'></div></div>";
+    return h+"</div>"}).join("")+(R.some(x=>x.estimado)?"<div class='mu'>* preço estimado</div>":""):"<span class='mu'>Nenhum abastecimento ainda.</span>";
+  if(!$("#p2").classList.contains("hide"))drawChart()}
+function drawChart(){const tr=trechos(rows()),m=tr.length?kmlG(tr):0;if(!window.Chart){$("#nc").textContent="Gráfico indisponível offline na 1ª abertura.";return}
+  $("#nc").textContent=tr.length<2?"O gráfico aparece com 2+ trechos (abastecimentos com tanque cheio).":"";if(chart)chart.destroy();
+  chart=new Chart($("#cv"),{type:"line",data:{labels:tr.map(x=>fd(x.data).slice(0,5)),datasets:[{label:"km/L",data:tr.map(x=>+x.kml.toFixed(2)),borderColor:"#10b981",backgroundColor:"#10b98133",tension:.3,fill:true},{label:"média",data:tr.map(()=>+m.toFixed(2)),borderColor:"#9aa3a8",borderDash:[5,5],pointRadius:0}]},options:{plugins:{legend:{labels:{color:"#9aa3a8"}}},scales:{x:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}},y:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}}}}})}
+
+/* histórico: editar / apagar */
+function salvarEdicao(id){
+  const it=S.items.find(x=>x.id===id),em=m=>{$("#em").textContent=m};
+  try{const data=$("#e_d").value,km=num($("#e_k").value);let T=num($("#e_t").value),L=num($("#e_l").value),P=num($("#e_p").value);
+    if(!data||isNaN(km)||!(T>0||L>0))throw new Error("Preencha data, km e valor ou litros.");
+    const ch=(a,b)=>Math.abs(a-b)>.0051,cT=ch(T,it.total),cL=ch(L,it.litros),cP=Math.abs(P-it.preco)>.00051;
+    if(cT&&cL)P=T/L;else if(cT&&cP)L=T/P;else if(cL&&cP)T=L*P;else if(cT)L=T/it.preco,P=it.preco;else if(cL)T=L*it.preco,P=it.preco;else if(cP){L=it.total/P;T=it.total}
+    if(!(T>0&&L>0&&P>0))throw new Error("Valores inválidos.");
+    checar(rows().filter(x=>x.id!==id),data,km);
+    Object.assign(it,{data,km,total:T,litros:L,preco:T/L,estimado:0});edId=null;commit()
+  }catch(e){em(e.message)}}
+$("#hi").onclick=e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.i,a=b.dataset.a;
+  if(a==="d"){if(delId===id){S.items=S.items.filter(x=>x.id!==id);delId=null;commit()}else{delId=id;render()}}
+  else if(a==="e"){edId=id;delId=null;render()}else if(a==="c"){edId=null;render()}else if(a==="s")salvarEdicao(id)};
 
 /* CSV */
 $("#ex").onclick=()=>{const L=[["data","km","litros","valor_total","preco_litro","tanque_cheio","preco_estimado"]];for(const x of rows())L.push([fd(x.data),x.km,f2(x.litros),f2(x.total),f2(x.preco,3),x.cheio?"sim":"não",x.estimado?"sim":"não"]);
@@ -119,28 +177,25 @@ function parseData(s){s=String(s).trim().replace(/"/g,"");let m;
   if(m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/))return iso(new Date(+m[1],m[2]-1,+m[3]));
   if(m=s.match(/^(\d{1,2})[-/.](\d{1,2})(?:[-/.](\d{2,4}))?/)){let y=m[3]?+m[3]:new Date().getFullYear();if(y<100)y+=2000;let a=+m[1],b=+m[2];if(b>12&&a<=12)[a,b]=[b,a];const d=new Date(y,b-1,a);return d.getMonth()===b-1?iso(d):null}return null}
 function splitL(l,d){const o=[];let c="",q=false;for(const ch of l){if(ch=='"')q=!q;else if(ch==d&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o}
-$("#fi").onchange=async e=>{const f=e.target.files[0];if(!f)return;let tx=(await f.text()).replace(/^\uFEFF/,"");const ls=tx.split(/\r?\n/).filter(l=>l.trim());if(ls.length<2){$("#mi").textContent="Arquivo vazio.";return}
-  const dl=(ls[0].match(/;/g)||[]).length>=(ls[0].match(/,/g)||[]).length&&ls[0].includes(";")?";":",";
-  const H=splitL(ls[0],dl).map(h=>h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim());
-  const ix=(...ks)=>H.findIndex(h=>ks.some(k=>h.includes(k)));const iD=ix("data","date"),iK=ix("km","odom"),iL=ix("litro"),iT=ix("valor","total","reais"),iP=ix("preco"),iC=ix("cheio");
+$("#fi").onchange=async e=>{const f=e.target.files[0];if(!f)return;const ls=(await f.text()).replace(/^\uFEFF/,"").split(/\r?\n/).filter(l=>l.trim());if(ls.length<2){$("#mi").textContent="Arquivo vazio.";return}
+  const dl=ls[0].includes(";")&&(ls[0].match(/;/g)||[]).length>=(ls[0].match(/,/g)||[]).length?";":",";
+  const H=splitL(ls[0],dl).map(h=>h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim()),ix=(...ks)=>H.findIndex(h=>ks.some(k=>h.includes(k)));
+  const iD=ix("data","date"),iK=ix("km","odom"),iL=ix("litro"),iT=ix("valor","total","reais"),iP=ix("preco"),iC=ix("cheio");
   if(iD<0||iK<0){$("#mi").textContent="Não achei as colunas data e km no cabeçalho.";return}
-  let add=0,skip=0,fix=0;const ex=new Set(S.items.map(x=>x.km));
-  for(const l of ls.slice(1)){const c=splitL(l,dl),dt=parseData(c[iD]),km=num(c[iK]);let L=num(c[iL]),T=num(c[iT]),P=num(c[iP]);
-    if(!dt||isNaN(km)||ex.has(km)){skip++;continue}
-    if(!(P>0)&&T>0&&L>0)P=T/L;if(!(L>0)&&T>0&&P>0)L=T/P;if(!(T>0)&&L>0&&P>0)T=L*P;
-    if(!(L>0&&T>0&&P>0)){skip++;continue}if(!/^\d{4}-\d{2}-\d{2}$/.test(String(c[iD]).trim()))fix++;
-    S.items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),data:dt,km,litros:L,total:T,preco:P,cheio:iC<0||!/n[aã]o|0|false/i.test(c[iC]),estimado:0});ex.add(km);add++}
-  commit();$("#mi").textContent=add+" importados, "+skip+" ignorados (duplicados ou incompletos), "+fix+" datas ajustadas.";e.target.value=""};
+  let add=0,skip=0,fix=0;const have=new Set(S.items.map(x=>x.km));
+  for(const l of ls.slice(1)){const c=splitL(l,dl),dt=parseData(c[iD]),km=num(c[iK]);let L=num(c[iL]),T=num(c[iT]),P=num(c[iP]);if(!dt||isNaN(km)||have.has(km)){skip++;continue}
+    if(!(P>0)&&T>0&&L>0)P=T/L;if(!(L>0)&&T>0&&P>0)L=T/P;if(!(T>0)&&L>0&&P>0)T=L*P;if(!(L>0&&T>0&&P>0)){skip++;continue}
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(c[iD]).trim()))fix++;S.items.push({id:uid(),data:dt,km,litros:L,total:T,preco:P,cheio:iC<0||!/n[aã]o|0|false/i.test(c[iC]),estimado:0});have.add(km);add++}
+  commit();$("#mi").textContent=add+" importados, "+skip+" ignorados (duplicados/incompletos), "+fix+" datas ajustadas.";e.target.value=""};
 
 /* instalar */
 let dp=null;const web=/^https?:$/.test(location.protocol)&&location.hostname!=="";
-addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e});
-addEventListener("appinstalled",()=>$("#ib").classList.add("hide"));
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e});addEventListener("appinstalled",()=>$("#ib").classList.add("hide"));
 if(matchMedia("(display-mode: standalone)").matches)$("#ib").classList.add("hide");
 const bn=t=>{$("#bn").textContent=t;$("#bn").classList.remove("hide")};
-if(!web)bn("Você abriu o arquivo direto (WhatsApp/Downloads). Assim o app funciona, mas não dá para instalar nem sincronizar de forma confiável. Hospede a pasta em https (Netlify Drop) e abra o endereço no Chrome.");
+if(!web)bn("Você abriu o arquivo direto. Funciona, mas não instala nem sincroniza de forma confiável: use o endereço https hospedado.");
 $("#ib").onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;return}
-  bn(!web?"Instalar só funciona abrindo o endereço https hospedado (não o arquivo recebido pelo WhatsApp).":/iphone|ipad/i.test(navigator.userAgent)?"No iPhone: Compartilhar → Adicionar à Tela de Início.":"No Chrome: menu ⋮ → Instalar app. Se não aparecer, abra o endereço direto no Chrome (não por dentro do WhatsApp) e use o app por alguns segundos.")};
+  bn(!web?"Instalar só funciona pelo endereço https hospedado.":/iphone|ipad/i.test(navigator.userAgent)?"No iPhone: Compartilhar → Adicionar à Tela de Início.":"No Chrome: menu ⋮ → Instalar app. Se não aparecer, abra o endereço direto no Chrome e use o app por alguns segundos.")};
 load();render();pull(false);
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script></body></html>
