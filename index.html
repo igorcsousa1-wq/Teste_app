@@ -22,7 +22,7 @@ button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-
 .k{background:var(--cd);border-radius:12px;padding:10px}.k small{display:block;color:var(--mu);font-size:12px}.k b{font-size:19px}.big{font-size:28px;color:var(--ac)}
 #msg{margin-top:10px;font-size:14px;white-space:pre-line}.er{color:var(--er)}.wn{color:var(--wn)}.ok{color:var(--ac)}.mu{color:var(--mu);font-size:13px}
 .h{padding:10px 0;border-top:1px solid var(--bd)}.hh{display:flex;justify-content:space-between;gap:8px;align-items:center}.h small{color:var(--mu)}.ef{margin-top:8px}
-.hide{display:none!important}canvas{max-height:220px}.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hide{display:none!important}.rec{background:var(--er)!important;color:#fff!important}canvas{max-height:220px}.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 #bn{background:var(--cd);border:1px solid var(--wn);color:var(--wn);border-radius:12px;padding:10px;margin-bottom:12px;font-size:14px}
 </style></head><body><main>
 <div class="top"><h1>⛽ Combustível Pro</h1><button id="ib" type="button">Instalar App</button></div>
@@ -30,7 +30,8 @@ button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-
 
 <section id="p1">
  <div class="cd"><h2>Registrar abastecimento</h2>
-  <input id="tx" placeholder='Ex.: Abasteci 80 reais, 52.300 km' enterkeyhint="send" autocomplete="off">
+  <div class="row" style="flex-wrap:nowrap"><input id="tx" placeholder='Digite ou fale: Abasteci 80 reais, 52.300 km' enterkeyhint="send" autocomplete="off"><button id="mic" type="button" style="flex:none;width:54px;font-size:20px">🎤</button></div>
+  <label style="display:flex;gap:8px;align-items:center"><input id="au" type="checkbox" style="width:auto">Registrar automaticamente ao terminar de falar</label>
   <label>Retroativo? Data (opcional — vazio = hoje ou a data escrita na frase)</label><input id="dt" type="date">
   <button id="sv" style="width:100%;margin-top:12px">Registrar</button><div id="msg"></div>
   <div class="chips" id="ch"></div>
@@ -45,7 +46,7 @@ button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-
 
 <section id="p3" class="hide">
  <div class="cd"><h2>Histórico</h2><div id="hi"></div></div>
- <div class="cd"><h2>Backup CSV</h2><div class="row"><button id="ex">Baixar CSV</button><button id="im" class="g">Importar CSV</button></div><input id="fi" type="file" accept=".csv,.txt,text/csv" class="hide"><div id="mi" class="mu"></div></div>
+ <div class="cd"><h2>Backup CSV</h2><div class="row"><button id="ex">Baixar CSV</button><button id="im" class="g">Importar CSV</button></div><input id="fi" type="file" accept=".csv,.txt,text/csv" class="hide"><div id="mi" class="mu"></div><button id="clr" class="g" style="margin-top:10px">Apagar todo o histórico</button></div>
  <div class="cd"><h2>Nuvem (Google Sheets)</h2>
   <label>URL do Apps Script (termina em /exec)</label><input id="cu" placeholder="https://script.google.com/macros/s/.../exec">
   <label>Token (o mesmo do script)</label><input id="ct" type="password">
@@ -109,13 +110,45 @@ function trechos(r){const o=[];let b=null,L=0,C=0;for(const x of r){if(!b){if(x.
 const kmlG=t=>sum(t.map(x=>x.dist))/sum(t.map(x=>x.L)),rkmG=t=>sum(t.map(x=>x.C))/sum(t.map(x=>x.dist));
 function aviso(R,km){const tr=trechos(R);let h="";for(const t of tr)if(t.ate===km||t.de===km){const o=tr.filter(x=>x!==t);if(o.length>=3){const m=kmlG(o);if(Math.abs(t.kml/m-1)>.35)h+="\n<span class='wn'>⚠️ Trecho "+fk(t.de)+"→"+fk(t.ate)+" km deu "+f2(t.kml)+" km/L (média "+f2(m)+"). Pode ter faltado lançar um abastecimento ou o km está errado.</span>"}}return h}
 
+/* voz: converte "oitenta reais, cinquenta e dois mil e trezentos quilômetros" em números */
+const U={zero:0,um:1,uma:1,dois:2,duas:2,"três":3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,catorze:14,quinze:15,dezesseis:16,dezessete:17,dezoito:18,dezenove:19,vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90,cem:100,cento:100,duzentos:200,trezentos:300,quatrocentos:400,quinhentos:500,seiscentos:600,setecentos:700,oitocentos:800,novecentos:900};
+const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function falaParaTexto(t){
+  const w=t.toLowerCase().split(/\s+/).filter(Boolean),c=x=>x.replace(/[,.;!?]+$/,""),isN=x=>x in U||/^\d+$/.test(x)||x==="mil",o=[];let i=0;
+  while(i<w.length){
+    if(!isN(c(w[i]))){o.push(w[i]);i++;continue}
+    let tot=0,cur=0;
+    while(i<w.length){const x=c(w[i]);
+      if(x==="mil"){tot+=(cur||1)*1000;cur=0;i++}
+      else if(isN(x)){if(!(x in U)&&cur>0)break;cur+=x in U?U[x]:+x;i++}
+      else if(x==="e"&&i+1<w.length&&isN(c(w[i+1]))&&(tot||cur))i++;
+      else break}
+    o.push(String(tot+cur))}
+  return o.join(" ").replace(/(\d+)\s*v[ií]rgula\s*(\d+)/g,"$1,$2")
+    .replace(new RegExp("\\b(\\d{1,2})\\s+de\\s+("+MES.join("|").replace("março","mar[cç]o")+")\\b","g"),(m,d,n)=>d+"/"+(MES.findIndex(x=>x.replace("ç","c")===n.replace("ç","c"))+1))}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR)$("#mic").classList.add("hide");
+else{let rec=null,on=false;
+  $("#au").checked=localStorage.getItem("comb_auto")==="1";$("#au").onchange=()=>localStorage.setItem("comb_auto",$("#au").checked?"1":"0");
+  $("#mic").onclick=()=>{if(on){rec.stop();return}
+    rec=new SR();rec.lang="pt-BR";rec.interimResults=true;
+    rec.onstart=()=>{on=true;$("#mic").textContent="⏹";$("#mic").classList.add("rec");msg("🎙️ Ouvindo… ex.: “abasteci oitenta reais, cinquenta e dois mil e trezentos quilômetros”")};
+    rec.onresult=e=>{let t="";for(const r of e.results)t+=r[0].transcript+" ";$("#tx").value=falaParaTexto(t.trim())};
+    rec.onerror=e=>msg("⚠️ Voz: "+({"not-allowed":"permita o microfone para este site no Chrome (cadeado ao lado do endereço → Permissões).","service-not-allowed":"microfone bloqueado.","no-speech":"não ouvi nada, tente de novo.","network":"sem internet (o reconhecimento de voz precisa de conexão)."}[e.error]||e.error),"er");
+    rec.onend=()=>{on=false;$("#mic").textContent="🎤";$("#mic").classList.remove("rec");
+      if($("#msg").classList.contains("er")||!$("#tx").value.trim())return;
+      if($("#au").checked)registrar();else msg("Ouvi: “"+$("#tx").value+"”\nConfira e toque em Registrar.")};
+    rec.start()}}
+$("#clr").onclick=()=>{const b=$("#clr");if(b.dataset.c){S.items=[];commit();b.textContent="Apagar todo o histórico";delete b.dataset.c;$("#mi").textContent="Histórico apagado."}
+  else{b.dataset.c=1;b.textContent="Toque de novo para confirmar";setTimeout(()=>{b.textContent="Apagar todo o histórico";delete b.dataset.c},4000)}};
+
 /* registrar */
 const ex=["Abasteci 80 reais, 52.300 km","50L, 52.300 km","Ontem abasteci 60 reais a 51.900 km","12/09 40L a 5,79/L 52.000 km"];
 $("#ch").innerHTML=ex.map(x=>"<button class='g' type='button'>"+x+"</button>").join("");
 $("#ch").onclick=e=>{if(e.target.tagName==="BUTTON"){$("#tx").value=e.target.textContent;$("#tx").focus()}};
 const msg=(t,c)=>{$("#msg").className=c||"";$("#msg").innerHTML=t};
 function registrar(){
-  const txt=$("#tx").value.trim();if(!txt)return;
+  const txt=falaParaTexto($("#tx").value.trim());if(!txt)return;
   try{
     const r=interpretar(txt);if(r.km===null)throw new Error("Faltou a quilometragem. Ex.: 'Abasteci 80 reais, 52.300 km'.");
     const data=$("#dt").value||iso(r.data||today()),R=rows();checar(R,data,r.km);
@@ -177,7 +210,8 @@ function parseData(s){s=String(s).trim().replace(/"/g,"");let m;
   if(m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/))return iso(new Date(+m[1],m[2]-1,+m[3]));
   if(m=s.match(/^(\d{1,2})[-/.](\d{1,2})(?:[-/.](\d{2,4}))?/)){let y=m[3]?+m[3]:new Date().getFullYear();if(y<100)y+=2000;let a=+m[1],b=+m[2];if(b>12&&a<=12)[a,b]=[b,a];const d=new Date(y,b-1,a);return d.getMonth()===b-1?iso(d):null}return null}
 function splitL(l,d){const o=[];let c="",q=false;for(const ch of l){if(ch=='"')q=!q;else if(ch==d&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o}
-$("#fi").onchange=async e=>{const f=e.target.files[0];if(!f)return;const ls=(await f.text()).replace(/^\uFEFF/,"").split(/\r?\n/).filter(l=>l.trim());if(ls.length<2){$("#mi").textContent="Arquivo vazio.";return}
+$("#fi").onchange=async e=>{const f=e.target.files[0];if(!f)return;const un=l=>{l=l.trim();return l.length>1&&l[0]=='"'&&l.endsWith('"')&&!l.slice(1,-1).includes('"')&&(l.match(/[;,\t]/g)||[]).length>=3?l.slice(1,-1):l};
+  const ls=(await f.text()).replace(/\uFEFF/g,"").split(/\r?\n/).map(un).filter(l=>l.trim());if(ls.length<2){$("#mi").textContent="Arquivo vazio.";return}
   const dl=ls[0].includes(";")&&(ls[0].match(/;/g)||[]).length>=(ls[0].match(/,/g)||[]).length?";":",";
   const H=splitL(ls[0],dl).map(h=>h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim()),ix=(...ks)=>H.findIndex(h=>ks.some(k=>h.includes(k)));
   const iD=ix("data","date"),iK=ix("km","odom"),iL=ix("litro"),iT=ix("valor","total","reais"),iP=ix("preco"),iC=ix("cheio");
