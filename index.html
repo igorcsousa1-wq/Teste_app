@@ -22,13 +22,14 @@ button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-
 .k{background:var(--cd);border-radius:12px;padding:10px}.k small{display:block;color:var(--mu);font-size:12px}.k b{font-size:19px}.big{font-size:28px;color:var(--ac)}
 #msg{margin-top:10px;font-size:14px;white-space:pre-line}.er{color:var(--er)}.wn{color:var(--wn)}.ok{color:var(--ac)}.mu{color:var(--mu);font-size:13px}
 .h{padding:10px 0;border-top:1px solid var(--bd)}.hh{display:flex;justify-content:space-between;gap:8px;align-items:center}.h small{color:var(--mu)}.ef{margin-top:8px}
-.hide{display:none!important}.rec{background:var(--er)!important;color:#fff!important}canvas{max-height:220px}.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hide{display:none!important}.sel{background:var(--ac)!important;color:#04271b!important;border-color:var(--ac)!important}.rvb{border-radius:12px;padding:10px;margin-bottom:12px;font-size:14px;border:1px solid var(--ac);color:var(--ac)}.rvb.rw{border-color:var(--wn);color:var(--wn)}.rvb.re{border-color:var(--er);color:var(--er)}.rec{background:var(--er)!important;color:#fff!important}canvas{max-height:220px}.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 #bn{background:var(--cd);border:1px solid var(--wn);color:var(--wn);border-radius:12px;padding:10px;margin-bottom:12px;font-size:14px}
 </style></head><body><main>
-<div class="top"><h1>⛽ Combustível Pro</h1><button id="ib" type="button">Instalar App</button></div>
+<div class="top"><h1>⛽ Combustível Pro <small style="font-size:12px;color:var(--mu)">v2.0</small></h1><button id="ib" type="button">Instalar App</button></div>
 <div id="bn" class="hide"></div>
 
 <section id="p1">
+ <div id="rv1" class="hide"></div>
  <div class="cd"><h2>Registrar abastecimento</h2>
   <div class="row" style="flex-wrap:nowrap"><input id="tx" placeholder='Digite ou fale: Abasteci 80 reais, 52.300 km' enterkeyhint="send" autocomplete="off"><button id="mic" type="button" style="flex:none;width:54px;font-size:20px">🎤</button></div>
   <label style="display:flex;gap:8px;align-items:center"><input id="au" type="checkbox" style="width:auto">Registrar automaticamente ao terminar de falar</label>
@@ -36,15 +37,7 @@ button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-
   <button id="sv" style="width:100%;margin-top:12px">Registrar</button><div id="msg"></div>
   <div class="chips" id="ch"></div>
   <p class="mu">Também entende: “ontem…”, “anteontem…”, “há 3 dias…”, “12/09…”, “dia 5…”, “50L a 5,79/L”, “parcial” (não encheu o tanque). Esqueceu de lançar? Pode enviar depois: a linha do tempo é reordenada e recalculada.</p></div>
-</section>
 
-<section id="p2" class="hide">
- <div class="cd"><h2>🔮 Previsão (30 dias)</h2><div id="pv"></div></div>
- <div class="g2" id="kp"></div>
- <div class="cd" style="margin-top:12px"><h2>Evolução do consumo (km/L)</h2><canvas id="cv"></canvas><div id="nc" class="wn"></div></div>
-</section>
-
-<section id="p3" class="hide">
  <div class="cd"><h2>Histórico</h2><div id="hi"></div></div>
  <div class="cd"><h2>Backup CSV</h2><div class="row"><button id="ex">Baixar CSV</button><button id="im" class="g">Importar CSV</button></div><input id="fi" type="file" accept=".csv,.txt,text/csv" class="hide"><div id="mi" class="mu"></div><button id="clr" class="g" style="margin-top:10px">Apagar todo o histórico</button></div>
  <div class="cd"><h2>Nuvem (Google Sheets)</h2>
@@ -52,8 +45,16 @@ button.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-
   <label>Token (o mesmo do script)</label><input id="ct" type="password">
   <div class="row" style="margin-top:10px"><button id="sa" class="g">Salvar config</button><button id="sp" class="g">Enviar agora</button><button id="sl" class="g">Puxar da nuvem</button></div><div id="ms" class="mu"></div></div>
 </section>
+
+<section id="p2" class="hide">
+ <div class="cd"><h2>🔮 Previsão (30 dias)</h2><div id="pv"></div></div>
+ <div class="g2" id="kp"></div>
+ <div class="cd" style="margin-top:12px"><h2>Evolução do consumo (km/L)</h2><div class="row" style="margin-bottom:8px"><button id="m1" class="g" type="button">Por dia</button><button id="m2" class="g" type="button">Média mensal</button></div><canvas id="cv"></canvas><div id="nc" class="wn"></div></div>
+ <div class="cd"><h2>🔧 Revisão a cada 5.000 km</h2><div id="rv"></div></div>
+</section>
+
 </main>
-<nav><button id="n1" class="on"><b>✍️</b>Registrar</button><button id="n2"><b>📊</b>Resumo</button><button id="n3"><b>🗂️</b>Dados</button></nav>
+<nav><button id="n1" class="on"><b>✍️</b>Registro &amp; Dados</button><button id="n2"><b>📊</b>Resumo</button></nav>
 <script>
 addEventListener("error",e=>{const b=document.querySelector("#bn");if(b){b.textContent="Erro no app: "+e.message;b.classList.remove("hide")}});
 const $=s=>document.querySelector(s),K="combpro_v2",KC="combpro_cfg",N="(\\d[\\d.,]*)";
@@ -67,8 +68,8 @@ const rows=()=>S.items.slice().sort((a,b)=>a.km-b.km||a.data.localeCompare(b.dat
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 
 /* abas */
-function tab(n){for(const m of[1,2,3]){$("#n"+m).classList.toggle("on",m==n);$("#p"+m).classList.toggle("hide",m!=n)}if(n==2)drawChart();scrollTo(0,0)}
-for(const n of[1,2,3])$("#n"+n).onclick=()=>tab(n);
+function tab(n){for(const m of[1,2]){$("#n"+m).classList.toggle("on",m==n);$("#p"+m).classList.toggle("hide",m!=n)}if(n==2)drawChart();scrollTo(0,0)}
+for(const n of[1,2])$("#n"+n).onclick=()=>tab(n);
 
 /* persistência local + nuvem */
 function load(){try{S=JSON.parse(localStorage.getItem(K)||localStorage.getItem("combpro_v1"))||S;cfg=JSON.parse(localStorage.getItem(KC))||cfg}catch(e){}$("#cu").value=cfg.url;$("#ct").value=cfg.token}
@@ -159,10 +160,10 @@ function registrar(){
     const retro=R.some(x=>x.km>r.km||x.data>data);
     S.items.push({id:uid(),data,km:r.km,litros:L,total:T,preco:P,cheio:r.cheio,estimado:est});commit();
     const all=rows(),tr=trechos(all),t=tr.find(x=>x.ate===r.km);
-    let h="<span class='ok'>✅ Registrado"+(retro?" (retroativo — linha do tempo recalculada)":"")+"</span>\n"+fd(data)+" · "+fk(r.km)+" km · "+f2(L)+" L · "+brl(T)+" · "+brl(P)+"/L"+(est?" <span class='wn'>(preço estimado — corrija na aba Dados)</span>":"");
+    let h="<span class='ok'>✅ Registrado"+(retro?" (retroativo — linha do tempo recalculada)":"")+"</span>\n"+fd(data)+" · "+fk(r.km)+" km · "+f2(L)+" L · "+brl(T)+" · "+brl(P)+"/L"+(est?" <span class='wn'>(preço estimado — corrija no histórico abaixo)</span>":"");
     if(!r.cheio)h+="\nTanque parcial: conta no próximo trecho completo.";
     if(t)h+="\nTrecho: "+fk(t.dist)+" km · "+f2(t.kml)+" km/L · "+brl(t.rkm)+"/km";
-    msg(h+aviso(all,r.km));$("#tx").value="";$("#dt").value=""
+    {const v=revInfo();msg(h+aviso(all,r.km)+(v&&v.falta<=v.av?"\n<span class='wn'>"+revTxt(v)[1]+"</span>":""))}$("#tx").value="";$("#dt").value=""
   }catch(e){msg("⚠️ "+e.message,"er")}}
 $("#sv").onclick=registrar;$("#tx").addEventListener("keydown",e=>{if(e.key==="Enter")registrar()});
 
@@ -176,16 +177,38 @@ function prever(R,tr){
   const at=Math.round((today()-pd(fim))/864e5);if(at>30)h+="<div class='wn' style='margin-top:8px'>⚠️ Último registro há "+at+" dias — pode faltar lançar abastecimentos; a previsão pode estar subestimada.</div>";return h}
 function render(){
   const R=rows(),tr=trechos(R),u=tr[tr.length-1],k=(a,b)=>"<div class='k'><small>"+a+"</small><b>"+b+"</b></div>",pm=R.length?sum(R.map(x=>x.total))/sum(R.map(x=>x.litros)):null;
-  $("#pv").innerHTML=prever(R,tr);
+  $("#pv").innerHTML=prever(R,tr);renderRev();
   $("#kp").innerHTML=k("km/L último trecho",u?f2(u.kml):"—")+k("km/L histórico",tr.length?f2(kmlG(tr)):"—")+k("R$/km último",u?brl(u.rkm):"—")+k("R$/km histórico",tr.length?brl(rkmG(tr)):"—")+k("Preço último litro",R.length?brl(R[R.length-1].preco):"—")+k("Preço médio litro",pm?brl(pm):"—");
   $("#hi").innerHTML=R.length?R.slice().reverse().map(x=>{const t=tr.find(y=>y.ate===x.km);
     let h="<div class='h'><div class='hh'><div><b>"+fd(x.data)+" · "+fk(x.km)+" km</b><br><small>"+f2(x.litros)+" L · "+brl(x.total)+" · "+brl(x.preco)+"/L"+(x.estimado?"*":"")+(x.cheio?"":" · parcial")+(t?" · "+f2(t.kml)+" km/L":"")+"</small></div><div class='row' style='flex:none'><button class='g' data-a='e' data-i='"+x.id+"'>✏️</button><button class='g' data-a='d' data-i='"+x.id+"'>"+(delId===x.id?"Confirmar?":"🗑")+"</button></div></div>";
     if(edId===x.id)h+="<div class='ef'><div class='g2'><div><label>Data</label><input id='e_d' type='date' value='"+x.data+"'></div><div><label>KM</label><input id='e_k' inputmode='numeric' value='"+x.km+"'></div><div><label>Valor total (R$)</label><input id='e_t' inputmode='decimal' value='"+f2(x.total)+"'></div><div><label>Litros</label><input id='e_l' inputmode='decimal' value='"+f2(x.litros)+"'></div></div><label>Preço/L</label><input id='e_p' inputmode='decimal' value='"+f2(x.preco,3)+"'><div class='row' style='margin-top:10px'><button data-a='s' data-i='"+x.id+"'>Salvar e recalcular</button><button class='g' data-a='c'>Cancelar</button></div><div id='em' class='er mu'></div></div>";
     return h+"</div>"}).join("")+(R.some(x=>x.estimado)?"<div class='mu'>* preço estimado</div>":""):"<span class='mu'>Nenhum abastecimento ainda.</span>";
   if(!$("#p2").classList.contains("hide"))drawChart()}
-function drawChart(){const tr=trechos(rows()),m=tr.length?kmlG(tr):0;if(!window.Chart){$("#nc").textContent="Gráfico indisponível offline na 1ª abertura.";return}
-  $("#nc").textContent=tr.length<2?"O gráfico aparece com 2+ trechos (abastecimentos com tanque cheio).":"";if(chart)chart.destroy();
-  chart=new Chart($("#cv"),{type:"line",data:{labels:tr.map(x=>fd(x.data).slice(0,5)),datasets:[{label:"km/L",data:tr.map(x=>+x.kml.toFixed(2)),borderColor:"#10b981",backgroundColor:"#10b98133",tension:.3,fill:true},{label:"média",data:tr.map(()=>+m.toFixed(2)),borderColor:"#9aa3a8",borderDash:[5,5],pointRadius:0}]},options:{plugins:{legend:{labels:{color:"#9aa3a8"}}},scales:{x:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}},y:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}}}}})}
+let cm=localStorage.getItem("comb_cm")==="m"?"m":"d";
+function setCm(m){cm=m;try{localStorage.setItem("comb_cm",m)}catch(e){}$("#m1").classList.toggle("sel",m==="d");$("#m2").classList.toggle("sel",m==="m");drawChart()}
+$("#m1").onclick=()=>setCm("d");$("#m2").onclick=()=>setCm("m");
+function serie(tr,modo){const g={};for(const t of tr){const k=modo==="m"?t.data.slice(0,7):t.data;(g[k]=g[k]||{d:0,L:0});g[k].d+=t.dist;g[k].L+=t.L}
+  const ks=Object.keys(g).sort();return{labels:ks.map(k=>modo==="m"?k.slice(5)+"/"+k.slice(2,4):fd(k).slice(0,5)),data:ks.map(k=>+(g[k].d/g[k].L).toFixed(2))}}
+function drawChart(){const tr=trechos(rows()),m=tr.length?kmlG(tr):0;$("#m1").classList.toggle("sel",cm==="d");$("#m2").classList.toggle("sel",cm==="m");
+  if(!window.Chart){$("#nc").textContent="Gráfico indisponível offline na 1ª abertura.";return}
+  const sr=serie(tr,cm);$("#nc").textContent=sr.data.length<(cm==="m"?1:2)?"O gráfico aparece com mais trechos (abastecimentos com tanque cheio).":"";if(chart)chart.destroy();
+  chart=new Chart($("#cv"),{type:cm==="m"?"bar":"line",data:{labels:sr.labels,datasets:[{label:cm==="m"?"km/L (média do mês)":"km/L (por dia)",data:sr.data,borderColor:"#10b981",backgroundColor:cm==="m"?"#10b981aa":"#10b98133",tension:.3,fill:cm!=="m"},{type:"line",label:"média geral",data:sr.data.map(()=>+m.toFixed(2)),borderColor:"#9aa3a8",borderDash:[5,5],pointRadius:0}]},options:{plugins:{legend:{labels:{color:"#9aa3a8"}}},scales:{x:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}},y:{ticks:{color:"#9aa3a8"},grid:{color:"#2c2c2c"}}}}})}
+
+/* revisão por km */
+function ritmo(R){if(R.length<2)return null;const fim=R[R.length-1].data,lim=iso(addD(pd(fim),-90));let c=R.filter(r=>r.data>=lim);if(c.length<2)c=R.slice(-2);const a=c[0],b=c[c.length-1],d=Math.round((pd(b.data)-pd(a.data))/864e5);return d>0?(b.km-a.km)/d:null}
+function revInfo(){const R=rows();if(!R.length)return null;const r=S.rev||{},iv=r.iv||5000,av=r.av??500,km=R[R.length-1].km,ult=r.ult!=null?r.ult:Math.ceil(km/iv)*iv-iv,prox=ult+iv,falta=prox-km,kd=ritmo(R);
+  return{iv,av,km,ult,prox,falta,dias:kd>0?Math.round(falta/kd):null}}
+function revTxt(v){const f=fk(Math.abs(v.falta)),dd=v.dias>0?" (~"+v.dias+" dias)":"";
+  if(v.falta<=0)return["re","🔧 Revisão de "+fk(v.prox)+" km "+(v.falta===0?"chegou":"vencida há "+f+" km")+". Agende e marque como feita."];
+  if(v.falta<=v.av)return["rw","🔧 Revisão de "+fk(v.prox)+" km se aproxima: faltam "+f+" km"+dd+"."];
+  return["","🔧 Próxima revisão: "+fk(v.prox)+" km — faltam "+f+" km"+dd+"."]}
+function renderRev(){const v=revInfo(),b=$("#rv1");
+  if(v&&v.falta<=v.av){const[c,t]=revTxt(v);b.className="rvb "+c;b.textContent=t}else b.className="hide";
+  if(!v){$("#rv").innerHTML="<span class='mu'>Registre um abastecimento para acompanhar a revisão.</span>";return}
+  const[c,t]=revTxt(v);$("#rv").innerHTML="<div class='rvb "+c+"'>"+t+"</div><div class='g3'><div><label>Última revisão (km)</label><input id='rv_u' inputmode='numeric' value='"+v.ult+"'></div><div><label>Intervalo (km)</label><input id='rv_i' inputmode='numeric' value='"+v.iv+"'></div><div><label>Avisar com (km)</label><input id='rv_a' inputmode='numeric' value='"+v.av+"'></div></div><div class='row' style='margin-top:10px'><button id='rv_s'>Salvar</button><button id='rv_f' class='g'>Revisão feita agora ("+fk(v.km)+" km)</button></div><div class='mu' style='margin-top:6px'>Sem ajuste, assumo revisões nos múltiplos de "+fk(v.iv)+" km. O aviso aparece no topo da página de registro.</div>"}
+$("#rv").onclick=e=>{const b=e.target.closest("button");if(!b)return;const v=revInfo();
+  if(b.id==="rv_f"&&v){S.rev={iv:v.iv,av:v.av,ult:v.km};commit()}
+  else if(b.id==="rv_s"){const u=num($("#rv_u").value),i=num($("#rv_i").value),a=num($("#rv_a").value);if(!(i>0)||isNaN(u)||!(a>=0))return;S.rev={ult:u,iv:i,av:a};commit()}};
 
 /* histórico: editar / apagar */
 function salvarEdicao(id){
